@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html ng-app="pluploadjs">
+    <head>
+        <title>Plupload AngularJS</title>
+        <script src="js/lib/angular.min.js"></script>
+        <script src="js/main.js"></script>
+        <script src="bower_components/plupload/js/plupload.full.min.js"></script>
+        <script src="bower_components/angular-plupload/dist/angular-plupload.min.js"></script>
+        <script src="js/controllers/upload.controller.js"></script>
+    </head>
+    <!-- https://github.com/remotty/angular-plupload -->
+    <body ng-controller="UploadController">
+        <h1>{{titulo}}</h1>
+        <h1>%{{percentLoad}}</h1>
+        <a plupload="fileUpload.url" plupload-options="fileUpload.options" plupload-callbacks="fileUpload.callbacks">
+            Upload Button
+        </a>
+        <h5 style="color:red">{{errorMessage}}</h5>
+        <h5 style="color:green">{{sucessMessage}}</h5>
+    </body>
+</html>
