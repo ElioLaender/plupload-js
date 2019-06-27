@@ -1,3 +1,215 @@
+///////////////////////////////////
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<style>
+        ul, #myUL {
+          list-style-type: none;
+        }
+        
+        #myUL {
+          margin: 0;
+          padding: 0;
+        }
+        
+          .caret {
+            cursor: pointer;
+            user-select: none;
+          }
+        
+          .caret::before {
+            content: "\25B6";
+            color: black;
+            display: inline-block;
+            margin-right: 6px;
+          }
+        
+          .caret-down::before {
+            transform: rotate(90deg);  
+          }
+        
+        .nested {
+          display: none;
+        }
+        
+        .active {
+          display: block;
+        }
+        </style>
+</head>
+<body>
+
+<h2>Cartórios Por Cidade</h2>
+
+<input type="text" id="mySearch" onkeyup="nodeSearch()" placeholder="Pesquise a cidade" title="Pesquise a cidade">
+
+
+<ul id="myUL">
+    <li>
+        <!-- ESTADO -->
+        <span class="caret"></span>
+        <input type="checkbox" id="minas-gerais" name="minas-gerais">
+        <label class="uf">Minas Gerais</label>
+        <ul class="nested">
+            <!-- CIDADES DO ESTADO -->
+            <li>
+                <span class="caret"></span>
+                <input type="checkbox" id="belo-horizonte" name="belo-horizonte">
+                <label>Belo Horizonte</label>
+                <ul class="nested">
+                <!-- CARTÓRIOS DA CIDADE -->
+                <li>
+                    <input type="checkbox" id="1-oficio" name="1-oficio">
+                    <label>1° Oficio Belo Horizonte</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="4-oficio" name="4-oficio">
+                    <label>4° Oficio Belo Horizonte</label>
+                </li>
+                </ul>
+            </li>  
+            <!-- Exemplo 2° Iteração -->
+            <li>
+                <span class="caret"></span>
+                <input type="checkbox" id="belo-vale" name="belo-vale">
+                <label>Belo Vale</label>
+                <ul class="nested">
+                <li>
+                    <input type="checkbox" id="cartorio-belo-vale" name="cartorio-belo-valoe">
+                    <label>Cartório de Belo Vale</label>
+                </li>
+                </ul>
+            </li>  
+        </ul>
+    </li>
+</ul>
+
+      
+<script>
+
+/*
+    * Desocultar todos elementos quando campo de busca for menor que 3 
+    * Retirar o estado do campo de busca - ok
+
+*/
+    caretControll();
+
+    function nodeSearch() {
+        var input, filter, ul, li, a, i, txtValue;
+        input = document.getElementById("mySearch");
+
+        if (input.value.length >= 3) {
+            filter = input.value.toUpperCase();
+            ul = document.getElementById("myUL");
+            li = ul.getElementsByTagName("li");
+            for (i = 0; i < li.length; i++) {
+                a = li[i].getElementsByTagName("label")[0];
+                // Retira da busca os estados
+                if(!a.classList.contains('uf')) {
+                    txtValue = a.textContent || a.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        li[i].style.display = "";
+                    } else {
+                        li[i].style.display = "none";
+                    }
+                }
+          
+            }
+        } else {
+            // Lógica para desocultar campos
+        }
+    }
+
+    // Controla a exibição dos nós
+    function caretControll() {
+        var toggler = document.getElementsByClassName("caret");
+        var i;
+        // For adicionando evento de click nos elementos
+        for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function() {
+            this.parentElement.querySelector(".nested").classList.toggle("active");
+            this.classList.toggle("caret-down");
+        });
+        }
+        // Setando estado de Minas aberto por default 
+        toggler[0].parentElement.querySelector(".nested").classList.toggle("active");
+        toggler[0].classList.toggle("caret-down");
+    }
+    
+
+    // Seta todos os checkboxes filhos como checked
+    $('input[type="checkbox"]').change(function(e) {
+
+        var checked = $(this).prop("checked"),
+            container = $(this).parent(),
+            siblings = container.siblings();
+
+        container.find('input[type="checkbox"]').prop({
+            indeterminate: false,
+            checked: checked
+        });
+
+        // Método recursivo para marcar/desmarcar checkboxes filhos.
+        function checkSiblings(el) {
+
+            var parent = el.parent().parent(),
+                all = true;
+
+            el.siblings().each(function() {
+                return all = ($(this).children('input[type="checkbox"]').prop("checked") === checked);
+            });
+
+            if (all && checked) {
+
+                parent.children('input[type="checkbox"]').prop({
+                indeterminate: false,
+                checked: checked
+                });
+
+                checkSiblings(parent);
+
+            } else if (all && !checked) {
+
+                parent.children('input[type="checkbox"]').prop("checked", checked);
+                parent.children('input[type="checkbox"]').prop("indeterminate", (parent.find('input[type="checkbox"]:checked').length > 0));
+                checkSiblings(parent);
+
+            } else {
+
+                el.parents("li").children('input[type="checkbox"]').prop({
+                indeterminate: true,
+                checked: false
+                });
+
+            }
+
+        }
+
+        checkSiblings(container);
+    });    
+
+</script>
+
+</body>
+</html>
+
+///////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
+
 <!DOCTYPE html>
 <html ng-app="pluploadjs">
     <head>
