@@ -1,3 +1,290 @@
+//////////////ultimo/////////////////
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+
+<style>
+        ul, #myUL {
+          list-style-type: none;
+        }
+        
+        #myUL {
+          margin: 0;
+          padding: 0;
+        }
+        
+          .caret {
+            cursor: pointer;
+            user-select: none;
+          }
+        
+          .caret::before {
+            content: "\25B6";
+            color: black;
+            display: inline-block;
+            margin-right: 6px;
+          }
+        
+          .caret-down::before {
+            transform: rotate(90deg);  
+          }
+        
+        .nested {
+          display: none;
+        }
+        
+        .active {
+          display: block;
+        }
+        </style>
+</head>
+<body>
+
+<h2>Cartórios Por Cidade</h2>
+
+<input type="text" id="mySearch" onkeyup="nodeSearch()" placeholder="Pesquise a cidade" title="Pesquise a cidade">
+
+
+<ul id="myUL">
+    <li>
+        <!-- ESTADO -->
+        <span class="caret"></span>
+        <div style="background-color: gray;">
+            <input type="checkbox" id="minas-gerais" name="minas-gerais" value="estate">
+        </div>
+        <div style="background-color: whitesmoke;">
+            <label class="uf">Minas Gerais</label>
+        </div>
+        <ul class="nested">
+            <!-- CIDADES DO ESTADO -->
+            <li>
+                <span class="caret"></span>
+                <div style="background-color: gray;">
+                    <input type="checkbox" id="belo-horizonte" name="belo-horizonte" value="city">
+                </div>
+                <div style="background-color: whitesmoke;">
+                    <label>Belo Horizonte</label>
+                </div>
+                <ul class="nested">
+                <!-- CARTÓRIOS DA CIDADE -->
+                <li>
+                    <div style="background-color: gray;">
+                        <input type="checkbox" id="1-oficio" name="1-oficio" value="1oficio">
+                    </div>
+                    <div style="background-color: whitesmoke;">
+                        <label>1° Oficio Belo Horizonte</label>
+                    </div>
+                </li>
+                <li>
+                    <div style="background-color: gray;">
+                        <input type="checkbox" id="4-oficio" name="4-oficio" value="4oficio">
+                    </div>
+                    <div style="background-color: whitesmoke;">
+                        <label>4° Oficio Belo Horizonte</label>
+                    </div>
+                </li>
+                </ul>
+            </li>  
+            <!-- Exemplo 2° Iteração -->
+            <li>
+                <span class="caret"></span>
+                <div style="background-color: gray;">
+                    <input type="checkbox" id="belo-vale" name="belo-vale" value="city">
+                </div>
+                <div style="background-color: whitesmoke;">
+                    <label>Belo Vale</label>
+                </div>
+                <ul class="nested">
+                <li>
+                    <div style="background-color: white;">
+                        <input type="checkbox" id="cartorio-belo-vale" name="cartorio-belo-valoe" value="cart-belo-vale">
+                    </div>
+                    <label>Cartório de Belo Vale</label>
+                </li>
+                </ul>
+            </li>  
+        </ul>
+    </li>
+</ul>
+
+<!-- Lista da direita -->
+<table>
+    <thead>
+        <tr>
+            <th>
+                <div>
+                    <label>Cartório</label>
+                </div>
+            </th>
+            <th>
+                <div>
+                    <label>Ações</label>
+                </div>
+            </th>
+        </tr>
+    </thead>
+    <tbody id="cart-selected-itens">
+    </tbody>
+</table>
+
+      
+<script>
+    /*
+        * Desocultar todos elementos quando campo de busca for menor que 3 - ok 
+        * Retirar o estado do campo de busca - ok
+        * Pegar nome do elemento clicado e gerar um elemento com base no mesmo - ok
+        * Selecionar checkboxes desconsiderando os de estado e cidade. - ok (utilizado filter)
+        * Remover status de checked do elemento removido - ok
+        * Remover TR do checkbox desmarcado - ok
+        * Resolver bug, ao remover elemento TR desmarcando checkbox, resolver duplicação do elemento que manteve selecionado. - OK (Problema que faltava indexOf no splice) 
+        * Remover elementos quando o pai é desmarcado. - ok (percorre removendo da table todos elementos desmarcados)
+        * Remover checked da cidade caso tenha sido removido todos cartórios da cidade - ok
+    */
+
+    // Controle dos cartórios selecionados.
+    var cartSelectedIndex = new Array();
+
+    function nodeSearch() {
+        var input, filter, ul, li, a, i, txtValue;
+        var input = document.getElementById("mySearch");
+        var filter = input.value.toUpperCase();
+        var ul = document.getElementById("myUL");
+        var li = ul.getElementsByTagName("li");
+        if (input.value.length >= 3) {
+            for (i = 0; i < li.length; i++) {
+                a = li[i].getElementsByTagName("label")[0];
+                // Retira da busca os estados
+                if(!a.classList.contains('uf')) {
+                    txtValue = a.textContent || a.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        li[i].style.display = "";
+                    } else {
+                        li[i].style.display = "none";
+                    }
+                }
+            }
+        } else {
+            // Lógica para desocultar campos
+            for (i = 0; i < li.length; i++) {
+                li[i].style.display = "";
+            }
+        }
+    }
+
+    // Controla a exibição dos nós adicionando evento com toggle para exibir ou não a lista. 
+    var toggler = document.getElementsByClassName("caret");
+    var i;
+    // For adicionando evento de click nos elementos
+    for (i = 0; i < toggler.length; i++) {
+        toggler[i].addEventListener("click", function() {
+            this.parentElement.querySelector(".nested").classList.toggle("active");
+            this.classList.toggle("caret-down");
+        });
+    }
+
+    // Setando estado de Minas aberto por default 
+    toggler[0].parentElement.querySelector(".nested").classList.toggle("active");
+    toggler[0].classList.toggle("caret-down");
+
+    function removeCartSelected(index) {
+        $('input[type="checkbox"]:checked').map(function() {
+            console.log(index, "array");
+            console.log(cartSelectedIndex);
+            if(this.value == index) {
+                $(this).prop('checked', false);
+                $("#cart-selected-tr-" + index).remove();
+                cartSelectedIndex.splice(index, 1);
+                checkControll(this, false);
+            }
+        });
+    }
+
+    // Seta todos os checkboxes filhos como checked
+    $('input[type="checkbox"]').change(function(e) {
+        checkControll(this);
+    });    
+
+    function checkControll(elemento, tagGenerator = true) {
+        var checked = $(elemento).prop("checked"),
+            container = $(elemento).parent().parent(),
+            siblings = container.children().siblings();
+
+        container.find('input[type="checkbox"]').prop({
+            indeterminate: false,
+            checked: checked
+        });
+
+        var checkedItems = $('input[type="checkbox"]:checked').filter(function (current) {
+            return this.value != 'estate' && this.value != 'city';
+        });
+
+        if (tagGenerator) {
+            for(var i = 0; i < checkedItems.length; i++) {
+                if (cartSelectedIndex.indexOf(checkedItems[i].value) == -1) {
+                    $('#cart-selected-itens').append(
+                    `<tr id="cart-selected-tr-${checkedItems[i].value}">
+                    <td>
+                        <input type="hidden" id="code-cart-input-${i}" name="registrationNumbers[${i}]" value="${checkedItems[i].value}"/>
+                        <label>${checkedItems[i].parentNode.parentNode.lastChild.previousSibling.innerText}</label>
+                    </td>
+                    <td>
+                        <button onclick="removeCartSelected('${checkedItems[i].value}')"> Apagar </button>
+                    </td>
+                    </tr>
+                    `);
+                    cartSelectedIndex.push(checkedItems[i].value);
+                }
+            }
+        }
+
+        // Método recursivo para marcar/desmarcar checkboxes filhos.
+        function checkSiblings(el) {
+            var parent = el.parent().parent(),
+                all = true;
+
+            el.siblings().each(function() {
+                return all = ($(this).children().children('input[type="checkbox"]').prop("checked") === checked);
+            });
+            
+            if (all && checked) {
+                parent.children().children('input[type="checkbox"]').prop({
+                indeterminate: false,
+                checked: checked
+                });
+                checkSiblings(parent);
+            } else if (all && !checked) {
+                parent.children().children('input[type="checkbox"]').prop("checked", checked);
+                parent.children().children('input[type="checkbox"]').prop("indeterminate", (parent.find('input[type="checkbox"]:checked').length > 0));
+                checkSiblings(parent); 
+            } else {
+                el.parents("li").children().children('input[type="checkbox"]').prop({
+                indeterminate: true,
+                checked: false
+                });
+            }
+        }
+        checkSiblings(container);   
+
+        // Remove o elemento TR de todos checkboxes desmarcados
+        $('input[type="checkbox"]').map(function () {
+            if ($(this).prop("checked") == false && $(this).val() != 'estate' && $(this).val() != 'city') {
+                $("#cart-selected-tr-" + $(this).val()).remove();
+                if (cartSelectedIndex.indexOf($(this).val()) != -1) {
+                    cartSelectedIndex.splice(cartSelectedIndex.indexOf($(this).val()), 1);
+                }
+                
+            }
+        });
+    }
+</script>
+
+</body>
+</html>
+
+/////////////ultimo//////////////////
+
 //////////////novo///////////////////
 <!DOCTYPE html>
 <html>
